@@ -23,7 +23,7 @@ import java.util.Properties;
  * Created by Liashkevich_Y on 05.02.2018.
  */
 public class Search {
-    private static final String PROPERTIES_FILENAME = "youtube.AIzaSyDxsX-11c-wqkOfRf1CmK0UuPZSD1EYYKQ";
+    private static final String PROPERTIES_FILENAME = "youtube.properties";
     private static final long NUMBER_OF_VIDEOS_RETURNED = 10;
 
     private static YouTube youtube;
@@ -31,8 +31,9 @@ public class Search {
     public static void main(String[] args) {
         Properties properties = new Properties();
 
+        //происходит добавление свойств из файла youtube.properties в объект properties
         try {
-            InputStream in = Search.class.getResourceAsStream("/" + PROPERTIES_FILENAME);//????
+            InputStream in = Search.class.getResourceAsStream("/" + PROPERTIES_FILENAME);
             properties.load(in);
         }catch (IOException e){
             System.err.println("There was an error reading " + PROPERTIES_FILENAME + ": " + e.getCause() + " : " + e.getMessage());
@@ -49,7 +50,7 @@ public class Search {
 
             YouTube.Search.List search = youtube.search().list("id,snippet");
 
-            String apiKey = properties.getProperty("youtube.AIzaSyDxsX-11c-wqkOfRf1CmK0UuPZSD1EYYKQ");
+            String apiKey = properties.getProperty("youtube.apikey");
             search.setKey(apiKey);
             search.setQ(queryTerm);
 
