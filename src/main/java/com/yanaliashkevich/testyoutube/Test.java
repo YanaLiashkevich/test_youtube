@@ -1,14 +1,13 @@
 package com.yanaliashkevich.testyoutube;
 
-import com.yanaliashkevich.searchbykeyword.Search;
+import com.yanaliashkevich.common.PropertiesHelper;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
 import org.json.JSONTokener;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -16,19 +15,11 @@ import java.util.Properties;
  * test
  */
 public class Test {
-    private static final String PROPERTIES_FILENAME = "youtube.properties";
 
     public static void main(String[] args) {
         //TODO: вынести заполнение свойств в отдельный класс
-        Properties properties = new Properties();
-
-        try {
-            InputStream in = Search.class.getResourceAsStream("/" + PROPERTIES_FILENAME);
-            properties.load(in);
-        }catch (IOException e){
-            System.err.println("There was an error reading " + PROPERTIES_FILENAME + ": " + e.getCause() + " : " + e.getMessage());
-            System.exit(1);
-        }
+        PropertiesHelper propertiesHelper = new PropertiesHelper();
+        Properties properties = propertiesHelper.getProperties();
 
         String apiKey = properties.getProperty("youtube.apikey");
 
@@ -49,8 +40,6 @@ public class Test {
                 JSONObject snippet = item.getJSONObject("snippet");
                 String title = snippet.getString("title");
                 System.out.println(title + "\nhttps://www.youtube.com/watch?v=" + videoId);
-
-
             }
         } catch (IOException e) {
             e.printStackTrace();
