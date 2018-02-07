@@ -17,9 +17,8 @@ import java.util.Properties;
 public class Test {
 
     public static void main(String[] args) {
-        //TODO: вынести заполнение свойств в отдельный класс
-        PropertiesHelper propertiesHelper = new PropertiesHelper();
-        Properties properties = propertiesHelper.getProperties();
+
+        Properties properties = PropertiesHelper.getProperties();
 
         String apiKey = properties.getProperty("youtube.apikey");
 

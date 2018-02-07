@@ -10,10 +10,11 @@ import java.util.Properties;
 public class PropertiesHelper {
     private static final String PROPERTIES_FILENAME = "youtube.properties";
 
-    public Properties getProperties(){
+    public static Properties getProperties(){
 
         Properties properties = new Properties();
 
+        //происходит добавление свойств из файла youtube.properties в объект properties
         try {
             InputStream in = PropertiesHelper.class.getResourceAsStream("/" + PROPERTIES_FILENAME);
             properties.load(in);

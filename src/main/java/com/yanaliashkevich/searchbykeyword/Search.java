@@ -10,10 +10,10 @@ import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Thumbnail;
+import com.yanaliashkevich.common.PropertiesHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
@@ -29,16 +29,9 @@ public class Search {
     private static YouTube youtube;
 
     public static void main(String[] args) {
-        Properties properties = new Properties();
 
         //происходит добавление свойств из файла youtube.properties в объект properties
-        try {
-            InputStream in = Search.class.getResourceAsStream("/" + PROPERTIES_FILENAME);
-            properties.load(in);
-        }catch (IOException e){
-            System.err.println("There was an error reading " + PROPERTIES_FILENAME + ": " + e.getCause() + " : " + e.getMessage());
-            System.exit(1);
-        }
+        Properties properties = PropertiesHelper.getProperties();
 
         try {
             youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
