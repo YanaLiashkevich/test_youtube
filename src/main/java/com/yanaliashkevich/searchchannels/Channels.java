@@ -21,7 +21,7 @@ public class Channels {
 
         String keyword = "DIY";
 
-        String url = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=" + keyword + "&key=" + apiKey;
+        String url = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&regionCode=US&maxResults=10&q=" + keyword + "&key=" + apiKey;
 
         //ArrayList channelsCount = new ArrayList();
 
@@ -36,23 +36,17 @@ public class Channels {
                 JSONObject item = items.getJSONObject(i);
                 JSONObject snippet = item.getJSONObject("snippet");
 
-                JSONObject recordingDetails = item.getJSONObject("recordingDetails");
-                JSONObject location = recordingDetails.getJSONObject("location");
-                if (!location.equals("US")){
-                    continue;
-                }
-
-                JSONObject statistics = item.getJSONObject("statistics");
+                /*JSONObject statistics = item.getJSONObject("statistics");
                 String subscriberCount = statistics.getString("subscriberCount");
                 Integer count = Integer.valueOf(subscriberCount);
                 if (!(count < 4000 || count > 100000)){
                     continue;
-                }
+                }*/
 
                 JSONObject id = item.getJSONObject("id");
-                String videoId = id.getString("videoId");
+                String channelId = id.getString("channelId");
                 String title = snippet.getString("title");
-                System.out.println(title + "\nhttps://www.youtube.com/watch?v=" + videoId);
+                System.out.println(title + "\nhttps://www.youtube.com/channel/" + channelId);
             }
 
         }catch (IOException e){

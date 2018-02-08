@@ -1,4 +1,4 @@
-package com.yanaliashkevich.searchbykeyword;
+package com.yanaliashkevich.searchchannels;
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpRequest;
@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * Created by Liashkevich_Y on 05.02.2018.
+ * Created by Liashkevich_Y on 08.02.2018.
  */
-public class Search {
+public class SearchChannels {
     private static final long NUMBER_OF_VIDEOS_RETURNED = 10;
 
     private static YouTube youtube;
@@ -46,13 +46,15 @@ public class Search {
             search.setKey(apiKey);
             search.setQ(queryTerm);
 
-            search.setType("video");
+            search.setType("channel");
 
-            search.setFields("items(id/kind,id/videoId,snippet/title,snippet/thumbnails/default/url)");
+            search.setFields("items(id/kind,id/channelId,snippet/title,snippet/thumbnails/default/url)");
             search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
 
             SearchListResponse searchResponse = search.execute();
             List<SearchResult> searchResultList = searchResponse.getItems();
+
+
 
             if (searchResultList != null){
                 prettyPrint(searchResultList.iterator(), queryTerm);
