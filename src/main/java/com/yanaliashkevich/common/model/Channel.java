@@ -6,10 +6,16 @@ package com.yanaliashkevich.common.model;
 public class Channel {
     private String title;
     private String id;
-//
-//    public Channel(String title, String id){
-//
-//    }
+
+    public long getSubscribersCount() {
+        return subscribersCount;
+    }
+
+    public void setSubscribersCount(long subscribersCount) {
+        this.subscribersCount = subscribersCount;
+    }
+
+    private long subscribersCount;
 
     public String getTitle(){
         return title;
