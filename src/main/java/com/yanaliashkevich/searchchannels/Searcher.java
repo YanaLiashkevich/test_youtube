@@ -16,7 +16,8 @@ import java.util.Properties;
  * Created by Liashkevich_Y on 07.02.2018.
  */
 public class Searcher {
-    public static void main(String[] args) {
+
+    public static ArrayList<Channel> searchChannels(){
         Properties properties = PropertiesHelper.getProperties();
 
         String apiKey = properties.getProperty("youtube.apikey");
@@ -65,20 +66,28 @@ public class Searcher {
                     channel.setId(channelId);
                     channel.setTitle(title);
 
-                    long subscribersCount = ChannelsChecker.getSubscribersCount(channel);
+                    long subscribersCount = ChannelsChecker.getSubscribersCount(channel); //сортируем по колличеству подписчиков
 
                     channel.setSubscribersCount(subscribersCount);
 
-                    if (subscribersCount > 0 && subscribersCount < 2000) {
+                    if (subscribersCount > 0 && subscribersCount < 1000) {
                         channels.add(channel);
                     }
+
+                    /*long viewCount = VideoViewCheckers.getViewsCount(channel); //сортируем по числу просмотров на видео
+
+                    channel.setViewCount(viewCount);
+
+                    if (viewCount > 0 && viewCount < 500){
+                        channels.add(channel);
+                    }*/
                 }
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        printChannels(channels);
+        return channels;
     }
 
     public static void printChannels(ArrayList<Channel> channels){

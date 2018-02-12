@@ -12,11 +12,10 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Created by Liashkevich_Y on 09.02.2018.
+ * Created by Liashkevich_Y on 12.02.2018.
  */
-public class ChannelsChecker {
-
-    public static long getSubscribersCount(Channel channel){
+public class VideoViewCheckers {
+    public static long getViewsCount(Channel channel){
         long result = 0;
 
         Properties properties = PropertiesHelper.getProperties();
@@ -32,8 +31,8 @@ public class ChannelsChecker {
 
             JSONObject item = items.getJSONObject(0);
             JSONObject statistics = item.getJSONObject("statistics");
-            String subscriberCount = statistics.getString("subscriberCount");
-            result = Long.valueOf(subscriberCount);
+            String viewCount = statistics.getString("viewCount");
+            result = Long.valueOf(viewCount);
 
         }catch (IOException e){
             e.printStackTrace();
