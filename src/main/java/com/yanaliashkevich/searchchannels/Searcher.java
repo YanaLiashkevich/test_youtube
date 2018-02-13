@@ -10,6 +10,7 @@ import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -23,18 +24,22 @@ public class Searcher {
         String apiKey = properties.getProperty("youtube.apikey");
 
         ArrayList<Channel> channels = new ArrayList<Channel>();
+        List<String> mySubscriptions = SubscriptionsChecker.getSuscriptionsChannels();
 
         String keyword = "DIY";
         String pageToken = null;
-
+        long pagesCount = getPagesCountFromUrl("https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&regionCode=US&maxResults=50&q="
+                + keyword + "&key=" + apiKey);
+        //TODO: сделать ввод из консоли колличества страниц, если их общее колличество больше 100 например
+        //TODO: и добавить это в цикл
         for (int page = 1; page <= 5; page++) {
             System.out.println("Processing of " + page + " page...");
             String url;
             if(page == 1){
-                url = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&regionCode=US&maxResults=20&q="
+                url = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&regionCode=US&maxResults=50&q="
                         + keyword + "&key=" + apiKey;
             } else if (pageToken != null){
-                url = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&regionCode=US&maxResults=20&q="
+                url = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&regionCode=US&maxResults=50&q="
                         + keyword + "&pageToken=" + pageToken + "&key=" + apiKey;
             } else {
                 break;
@@ -66,29 +71,13 @@ public class Searcher {
                     channel.setId(channelId);
                     channel.setTitle(title);
 
-                    /*long subscribersCount = ChannelsChecker.getSubscribersCount(channel); //сортируем по колличеству подписчиков
+                    long subscribersCount = ChannelsChecker.getSubscribersCount(channel); //сортируем по колличеству подписчиков
 
                     channel.setSubscribersCount(subscribersCount);
 
-                    if (subscribersCount > 0 && subscribersCount < 1000) {
-                        channels.add(channel);
-                    }*/
-
-                    long viewCount = VideoViewCheckers.getViewsCount(channel); //сортируем по числу просмотров на видео
-
-                    channel.setViewCount(viewCount);
-
-                    if (viewCount > 0 && viewCount < 2000){
+                    if (subscribersCount > 0 && subscribersCount < 1000 && !mySubscriptions.contains(channelId)) {
                         channels.add(channel);
                     }
-
-                    String subscriptionsCount = SubscriptionsChecker.getSuscriptionsChannels(channel);
-                    channel.setSubscriptionsCount(subscriptionsCount);
-
-                    if (subscriptionsCount == channelId){
-                        continue;
-                    }
-
                 }
 
             } catch (IOException e) {
@@ -106,5 +95,12 @@ public class Searcher {
             System.out.println(title + "\ncount of subscribers = " + subscribersCount + "\nhttps://www.youtube.com/channel/" + id);
             System.out.println();
         }
+    }
+
+    public static long getPagesCountFromUrl(String url) {
+        Document doc = Jsoup.connect(url).timeout(0).ignoreContentType(true).get();
+
+        String getJson = doc.text();
+        JSONObject jsonObject = (JSONObject) new JSONTokener(getJson).nextValue();
     }
 }

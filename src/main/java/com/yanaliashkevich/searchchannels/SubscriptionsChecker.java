@@ -10,6 +10,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -17,39 +19,50 @@ import java.util.Properties;
  */
 public class SubscriptionsChecker {
 
-    public static String getSuscriptionsChannels(Channel channel){
-        String result = null;
+    public static List<String> getSuscriptionsChannels(){
+        List<String> result = new ArrayList<String>();
 
         Properties properties = PropertiesHelper.getProperties();
         String apiKey = properties.getProperty("youtube.apikey");
+        //TODO: вынести в проперти айди своего канала
+        String url = "https://www.googleapis.com/youtube/v3/subscriptions?part=id&maxResults=50&channelId=UC6SZ7BvuP1uqUMUvUQJlxUg&key="
+                + apiKey;
 
-        String url = "https://www.googleapis.com/youtube/v3/subscriptions?part=id&channelId=" + channel.getId() + "&key=" + apiKey;
+        long pagesCount = Searcher.getPagesCountFromUrl(url);
+
+
 
         String pageToken = null;
-        int page = 1;
 
-        if(page == 1){
-            url = "https://www.googleapis.com/youtube/v3/subscriptions?part=id&channelId="
-                    + channel.getId() + "&key=" + apiKey;
-        } else if (pageToken != null){
-            url = "https://www.googleapis.com/youtube/v3/subscriptions?part=id&channelId="
-                    + channel.getId() + "&pageToken=" + pageToken + "&key=" + apiKey;
-        } else {
+        for (int page = 1; page <= pagesCount; page++) {
+            if(page > 1 && pageToken != null){
+                url = "https://www.googleapis.com/youtube/v3/subscriptions?part=id&maxResults=50&channelId=UC6SZ7BvuP1uqUMUvUQJlxUg&pageToken=" +
+                        pageToken + "&key=" + apiKey;
+            }
+            try {
+                Document doc = Jsoup.connect(url).timeout(0).ignoreContentType(true).get();
+                String getJson = doc.text();
 
+                JSONObject jsonObject = (JSONObject) new JSONTokener(getJson).nextValue();
+
+                if (jsonObject.has("nextPageToken")) {
+                    pageToken = jsonObject.getString("nextPageToken");
+                } else {
+                    pageToken = null;
+                }
+
+                JSONArray items = jsonObject.getJSONArray("items");
+                JSONObject item = items.getJSONObject(0);
+                String channelId = item.getString("id");
+                result.add(channelId);
+
+
+            }catch (IOException e){
+                e.printStackTrace();
+            }
         }
 
-        try {
-            Document doc = Jsoup.connect(url).timeout(0).ignoreContentType(true).get();
-            String getJson = doc.text();
 
-            JSONObject jsonObject = (JSONObject) new JSONTokener(getJson).nextValue();
-            JSONArray items = jsonObject.getJSONArray("items");
-            JSONObject item = items.getJSONObject(0);
-            result =item.getString("id");
-
-        }catch (IOException e){
-            e.printStackTrace();
-        }
 
         return result;
     }
