@@ -7,6 +7,16 @@ public class Channel {
     private String title;
     private String id;
 
+    public String getSubscriptionsCount() {
+        return subscriptionsCount;
+    }
+
+    public void setSubscriptionsCount(String subscriptionsCount) {
+        this.subscriptionsCount = subscriptionsCount;
+    }
+
+    private String subscriptionsCount;
+
     public long getViewCount() {
         return viewCount;
     }

@@ -66,21 +66,29 @@ public class Searcher {
                     channel.setId(channelId);
                     channel.setTitle(title);
 
-                    long subscribersCount = ChannelsChecker.getSubscribersCount(channel); //сортируем по колличеству подписчиков
+                    /*long subscribersCount = ChannelsChecker.getSubscribersCount(channel); //сортируем по колличеству подписчиков
 
                     channel.setSubscribersCount(subscribersCount);
 
                     if (subscribersCount > 0 && subscribersCount < 1000) {
                         channels.add(channel);
-                    }
+                    }*/
 
-                    /*long viewCount = VideoViewCheckers.getViewsCount(channel); //сортируем по числу просмотров на видео
+                    long viewCount = VideoViewCheckers.getViewsCount(channel); //сортируем по числу просмотров на видео
 
                     channel.setViewCount(viewCount);
 
-                    if (viewCount > 0 && viewCount < 500){
+                    if (viewCount > 0 && viewCount < 2000){
                         channels.add(channel);
-                    }*/
+                    }
+
+                    String subscriptionsCount = SubscriptionsChecker.getSuscriptionsChannels(channel);
+                    channel.setSubscriptionsCount(subscriptionsCount);
+
+                    if (subscriptionsCount == channelId){
+                        continue;
+                    }
+
                 }
 
             } catch (IOException e) {
