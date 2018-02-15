@@ -28,10 +28,13 @@ public class SubscriptionsChecker {
                 + apiKey;
 
         long pagesCount = Searcher.getPagesCountFromUrl(url);
+        System.out.println("getSuscriptionsChannels.pagesCount: " + pagesCount);
 
         String pageToken = null;
 
         for (int page = 1; page <= pagesCount; page++) {
+            System.out.println("SubscriptionsChecker: Processing of " + page + " page...");
+
             if(page > 1 && pageToken != null){
                 url = "https://www.googleapis.com/youtube/v3/subscriptions?part=id&maxResults=50&channelId=" + myChannelId + "&pageToken=" +
                         pageToken + "&key=" + apiKey;

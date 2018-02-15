@@ -27,6 +27,8 @@ public class Searcher {
         ArrayList<Channel> channels = new ArrayList<Channel>();
         List<String> mySubscriptions = SubscriptionsChecker.getSuscriptionsChannels();
 
+        System.out.println(mySubscriptions);
+
         String keyword = "DIY";
         String pageToken = null;
         long pagesCount = getPagesCountFromUrl("https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&regionCode=US&maxResults=50&q="
@@ -41,7 +43,7 @@ public class Searcher {
 
         for (int page = 1; page <= pagesCount; page++) {
 
-            System.out.println("Processing of " + page + " page...");
+            System.out.println("Searcher: Processing of " + page + " page...");
             String url;
             if(page == 1){
                 url = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&regionCode=US&maxResults=50&q="
@@ -54,11 +56,12 @@ public class Searcher {
             }
 
             try {
+                Document doc = Jsoup.connect(url).timeout(10000).ignoreContentType(true).get();
 
-                Document doc = Jsoup.connect(url)
-                        .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
-                        .referrer("none")
-                        .get();
+//                Document doc = Jsoup.connect(url)
+//                        .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
+//                        .referrer("none")
+//                        .get();
 
                 /*Document doc = Jsoup
                         .connect(url)
@@ -116,25 +119,35 @@ public class Searcher {
             System.out.println(title + "\ncount of subscribers = " + subscribersCount + "\nhttps://www.youtube.com/channel/" + id);
             System.out.println();
         }
+        System.out.println("Channels Found: " + channels.size());
     }
 
     public static long getPagesCountFromUrl(String url) {
 
-        long result = 0;
+        long pages = 0;
         try {
-            Document doc = Jsoup.connect(url).timeout(0).ignoreContentType(true).get();
+            Document doc = Jsoup.connect(url).timeout(10000).ignoreContentType(true).get();
 
             String getJson = doc.text();
             JSONObject jsonObject = (JSONObject) new JSONTokener(getJson).nextValue();
-            JSONArray items = jsonObject.getJSONArray("items");
-            JSONObject item = items.getJSONObject(0);
-            JSONArray pageInfo = item.getJSONArray("pageInfo");
-            result = pageInfo.getLong(Integer.parseInt("totalResults"));
+            System.out.println(jsonObject);
+
+            JSONObject pageInfo = jsonObject.getJSONObject("pageInfo");
+
+            Long totalResults = pageInfo.getLong("totalResults");
+            System.out.println("totalResults: " + totalResults);
+            Long resultsPerPage = pageInfo.getLong("resultsPerPage");
+            System.out.println("resultsPerPage: " + resultsPerPage);
+            Long endOfDivided = totalResults % resultsPerPage;
+            System.out.println("endOfDivided: " + endOfDivided);
+
+            pages = endOfDivided > 0 ? totalResults / resultsPerPage + 1 : totalResults / resultsPerPage;
+            System.out.println("pages: " + pages);
 
         }catch (IOException e){
             e.printStackTrace();
         }
 
-        return result;
+        return pages;
     }
 }
