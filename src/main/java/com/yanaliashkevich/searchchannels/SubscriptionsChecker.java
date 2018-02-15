@@ -1,8 +1,6 @@
 package com.yanaliashkevich.searchchannels;
 
 import com.yanaliashkevich.common.PropertiesHelper;
-
-import com.yanaliashkevich.common.model.Channel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -24,19 +22,18 @@ public class SubscriptionsChecker {
 
         Properties properties = PropertiesHelper.getProperties();
         String apiKey = properties.getProperty("youtube.apikey");
+        String myChannelId = properties.getProperty("youtube.myChannelId");
         //TODO: вынести в проперти айди своего канала
-        String url = "https://www.googleapis.com/youtube/v3/subscriptions?part=id&maxResults=50&channelId=UC6SZ7BvuP1uqUMUvUQJlxUg&key="
+        String url = "https://www.googleapis.com/youtube/v3/subscriptions?part=id&maxResults=50&channelId=" + myChannelId +"&key="
                 + apiKey;
 
         long pagesCount = Searcher.getPagesCountFromUrl(url);
-
-
 
         String pageToken = null;
 
         for (int page = 1; page <= pagesCount; page++) {
             if(page > 1 && pageToken != null){
-                url = "https://www.googleapis.com/youtube/v3/subscriptions?part=id&maxResults=50&channelId=UC6SZ7BvuP1uqUMUvUQJlxUg&pageToken=" +
+                url = "https://www.googleapis.com/youtube/v3/subscriptions?part=id&maxResults=50&channelId=" + myChannelId + "&pageToken=" +
                         pageToken + "&key=" + apiKey;
             }
             try {
@@ -61,8 +58,6 @@ public class SubscriptionsChecker {
                 e.printStackTrace();
             }
         }
-
-
 
         return result;
     }

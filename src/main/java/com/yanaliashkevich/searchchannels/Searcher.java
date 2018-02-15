@@ -12,13 +12,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Scanner;
 
 /**
  * Created by Liashkevich_Y on 07.02.2018.
  */
 public class Searcher {
 
-    public static ArrayList<Channel> searchChannels(){
+    public static ArrayList<Channel> searchChannels() {
         Properties properties = PropertiesHelper.getProperties();
 
         String apiKey = properties.getProperty("youtube.apikey");
@@ -30,9 +31,16 @@ public class Searcher {
         String pageToken = null;
         long pagesCount = getPagesCountFromUrl("https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&regionCode=US&maxResults=50&q="
                 + keyword + "&key=" + apiKey);
-        //TODO: сделать ввод из консоли колличества страниц, если их общее колличество больше 100 например
-        //TODO: и добавить это в цикл
-        for (int page = 1; page <= 5; page++) {
+
+        //достаем колличество
+        if (pagesCount > 100){
+            Scanner in = new Scanner(System.in);
+            System.out.println("Please enter a pages count: ");
+            pagesCount = in.nextInt();
+        }
+
+        for (int page = 1; page <= pagesCount; page++) {
+
             System.out.println("Processing of " + page + " page...");
             String url;
             if(page == 1){
@@ -46,7 +54,20 @@ public class Searcher {
             }
 
             try {
-                Document doc = Jsoup.connect(url).timeout(0).ignoreContentType(true).get();
+
+                Document doc = Jsoup.connect(url)
+                        .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
+                        .referrer("none")
+                        .get();
+
+                /*Document doc = Jsoup
+                        .connect(url)
+	                    .userAgent("Mozilla/5.0")
+                        .ignoreHttpErrors(true)
+                        .ignoreContentType(true)
+                        .timeout(5000).get();*/
+
+                //Document doc = Jsoup.connect(url).timeout(0).ignoreContentType(true).userAgent("Chrome/63.0.3239.132").referrer("https://www.googleapis.com/").get();
 
                 String getJson = doc.text();
                 JSONObject jsonObject = (JSONObject) new JSONTokener(getJson).nextValue();
@@ -98,9 +119,22 @@ public class Searcher {
     }
 
     public static long getPagesCountFromUrl(String url) {
-        Document doc = Jsoup.connect(url).timeout(0).ignoreContentType(true).get();
 
-        String getJson = doc.text();
-        JSONObject jsonObject = (JSONObject) new JSONTokener(getJson).nextValue();
+        long result = 0;
+        try {
+            Document doc = Jsoup.connect(url).timeout(0).ignoreContentType(true).get();
+
+            String getJson = doc.text();
+            JSONObject jsonObject = (JSONObject) new JSONTokener(getJson).nextValue();
+            JSONArray items = jsonObject.getJSONArray("items");
+            JSONObject item = items.getJSONObject(0);
+            JSONArray pageInfo = item.getJSONArray("pageInfo");
+            result = pageInfo.getLong(Integer.parseInt("totalResults"));
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+        return result;
     }
 }
